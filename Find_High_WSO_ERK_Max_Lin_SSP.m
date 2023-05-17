@@ -24,19 +24,26 @@ obj_fun = @(x) 0;
 % Define the nonlinear constraints
 nonlconfun = @(x) myconstraints(x, s, p, q, Stab_Coeff);
 
-% Define the initial guess
-A0 = tril(rand(s),-1); b0 = rand(s,1); x0 = pack_rk(A0,b0);
-
 % Define the lower and upper bounds for x
-lb = [-inf(s*(s-1)/2, 1); -inf(s, 1)];
-ub = [inf(s*(s-1)/2, 1); inf(s, 1)];
+max_mag = 7; % This can be set to inf if just testing whether methods exist
+lb = [-max_mag*ones(s*(s-1)/2, 1); -max_mag*ones(s, 1)];
+ub = [max_mag*ones(s*(s-1)/2, 1); max_mag*ones(s, 1)];
 
 % Solve the optimization problem
 opts = optimoptions(@fmincon,'MaxFunEvals',20000,'TolCon',1.e-14,...
     'TolFun',1.e-14,'TolX',1.e-12,'MaxIter',20000,'Algorithm','sqp',...
     'Display','notify');
-[x,fval,exitflag,output,lambda] = fmincon(obj_fun,x0,[],[],[],[],...
-    [],[], nonlconfun,opts);
+exitflag = -1;
+iter = 0;
+
+while (exitflag ~= 1) && (iter<1000)
+    % Define the initial guess
+    A0 = tril(rand(s),-1); b0 = rand(s,1); x0 = pack_rk(A0,b0);
+
+    [x,fval,exitflag,output,lambda] = fmincon(obj_fun,x0,[],[],[],[],...
+        [],[], nonlconfun,opts);
+    iter = iter+1
+end
 
 % Extract A and b from x
 [A,b] = unpack_rk(x,s);
@@ -127,6 +134,7 @@ function [Cineq, Ceq] = myconstraints(x, s, p, q, Stab_Coeff)
 %     for i = p+1:s-1
 %         Ceq(last_ind+(i-p),1) = b'*A^(i-1)*e - Stab_Coeff(i+1);
 %     end
+    Ceq(end+1,1) = A(q+1,q);
 end
 
 %-------------------------------------------------------------------------%
