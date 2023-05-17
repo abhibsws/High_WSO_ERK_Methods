@@ -41,12 +41,13 @@ while (exitflag ~= 1) && (iter<1000)
     A0 = tril(rand(s),-1); b0 = rand(s,1); x0 = pack_rk(A0,b0);
 
     [x,fval,exitflag,output,lambda] = fmincon(obj_fun,x0,[],[],[],[],...
-        [],[], nonlconfun,opts);
+        lb,ub, nonlconfun,opts);
     iter = iter+1
 end
 
 % Extract A and b from x
 [A,b] = unpack_rk(x,s);
+c = sum(A,2);
 [Cineq, Ceq] = myconstraints(x, s, p, q, Stab_Coeff);
 
 fprintf('Exitflag = %d \n',exitflag)
