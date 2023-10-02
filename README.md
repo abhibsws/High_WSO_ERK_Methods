@@ -1,1 +1,0 @@
-# High WSO ERK Methods
