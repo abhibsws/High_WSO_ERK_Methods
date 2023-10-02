@@ -1,5 +1,5 @@
-# Explicit Runge--Kutta Methods that Alleviate Order Reduction
-## Authors: Abhijit Biswas, David Ketcheson, Steven Roberts, enjamin Seibold, and David Shirokoff
+# Explicit Runge-Kutta Methods that Alleviate Order Reduction
+## Authors: Abhijit Biswas, David Ketcheson, Steven Roberts, Benjamin Seibold, and David Shirokoff
 
 #### This repository contains all the code used to generate the figures in the manuscript. To reproduce the figures and obtain the coefficients of the ERK methods with high weak stage order, follow these steps:
 - Clone the repository. Inside the cloned repository, you will find a folder named 'Convg_Plot_From_Data'.
