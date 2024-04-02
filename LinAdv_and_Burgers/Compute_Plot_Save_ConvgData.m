@@ -4,13 +4,13 @@
 % 'eq_ind' for different test cases below.                                %
 %=========================================================================%
 
-eq_ind = 2; % change here for different test case
+eq_ind = 3; % change here for different test case
 % Different test problems
-EQN = {'LinAdv','Burgers'};
+EQN = {'LinAdv','Burgers','VarLinAdv'};
 % Different initial conditions
-IC = [1,1];
+IC = [1,1,1];
 % Final time
-TF = [0.7,0.8];
+TF = [0.7,0.8,0.7];
 
 eqn=EQN{eq_ind}; TC=IC(eq_ind); tf=TF(eq_ind);
 
@@ -31,6 +31,15 @@ switch eqn
         M = [ceil(10.^linspace(1.2,3,10));ceil(10.^linspace(1.2,3,10));ceil(10.^linspace(1.2,3,10));
             ceil(10.^linspace(1.2,2.5,10));ceil(10.^linspace(1.2,2.5,10));ceil(10.^linspace(1.2,2.5,10));
             ceil(10.^linspace(1.2,2.5,10));ceil(10.^linspace(1.2,2.5,10));ceil(10.^linspace(1.2,2.5,10))];
+        %M = ceil(10.^linspace(1.2,3,10));
+        MU = [0.9,0.9,0.9,0.9,0.9,0.9,0.9,0.9,0.9]; % CFL numbers
+    case 'VarLinAdv'
+        % Spatial order and grid points
+        sp_or = [1,1,1,1,1,1,1,1,1];
+        max_a = 1; % max of the inital profile for the Burgers equation
+        M = [ceil(10.^linspace(1.2,3,10));ceil(10.^linspace(1.2,3,10));ceil(10.^linspace(1.2,3,10));
+            ceil(10.^linspace(1.2,2.5,10));ceil(10.^linspace(1.2,2.5,10));ceil(10.^linspace(1.2,2.5,10));
+            ceil(10.^linspace(.8,2.2,10));ceil(10.^linspace(.8,2.2,10));ceil(10.^linspace(.8,2.2,10))];
         %M = ceil(10.^linspace(1.2,3,10));
         MU = [0.9,0.9,0.9,0.9,0.9,0.9,0.9,0.9,0.9]; % CFL numbers
 end
@@ -55,7 +64,10 @@ for i = 1:length(S)
                 U_Err(i,j) = uerr; dU_Err(i,j) = duerr; 
             case 'Burgers'
                 [uerr,duerr] = BurgersTestProbZeroSpError(TC,M(i,j),s,p,q,scheme_no,mu,tf);
-                U_Err(i,j) = uerr; dU_Err(i,j) = duerr;              
+                U_Err(i,j) = uerr; dU_Err(i,j) = duerr;    
+            case 'VarLinAdv'
+                [uerr,duerr] = VarCoeffLinAdvZeroSpError(TC,M(i,j),s,p,q,scheme_no,mu,tf);
+                U_Err(i,j) = uerr; dU_Err(i,j) = duerr; 
         end
     end   
 end
@@ -84,6 +96,13 @@ switch eqn
         st41 = 7; end41 = 10; st42 = 7; end42 = 10; st43 = 7; end43 = 10;
         Cof5 = [8e-6,8e-4,7e-5]; Sl5 = [1,2,3];lim5 = [5e-15,5e-5];
         st51 = 5; end51 = 10; st52 = 5; end52 = 8; st53 = 5; end53 = 8;
+    case 'VarLinAdv'
+        Cof3 = [1e-1,9e-2,2e+0]; Sl3 = [1,2,3]; lim3 = [1e-11,5e-3];
+        st31 = 7; end31 = 10; st32 = 5; end32 = 8; st33 = 7; end33 = 10;
+        Cof4 = [5e-3,6e-2,3e+0]; Sl4 = [2,3,4]; lim4 = [5e-15,1e-3];
+        st41 = 7; end41 = 10; st42 = 6; end42 = 10; st43 = 5; end43 = 9;
+        Cof5 = [1e-4,3e-2,5e-2]; Sl5 = [2,4,5]; lim5 = [5e-16,1e-5];
+        st51 = 7; end51 = 10; st52 = 4; end52 = 8; st53 = 5; end53 = 9;
 end
 
 
@@ -123,9 +142,13 @@ switch eqn
         legend({'(3,3,1):u','(3,3,1):u_x','(4,3,2):u','(4,3,2):u_x',...
         '(5,3,3):u','(5,3,3):u_x',sprintf('Slope %d',Sl3(1)),...
         sprintf('Slope %d',Sl3(2)),sprintf('Slope %d',Sl3(3))},'NumColumns',3)
+    case 'VarLinAdv'
+        legend({'(3,3,1):u','(3,3,1):u_x','(4,3,2):u','(4,3,2):u_x',...
+        '(5,3,3):u','(5,3,3):u_x',sprintf('Slope %d',Sl3(1)),...
+        sprintf('Slope %d',Sl3(2)),sprintf('Slope %d',Sl3(3))},'NumColumns',3)
 end
 xlim([dts(1,end),dts(1,1)])
-ylim([lim3(1),lim3(2)])
+%ylim([lim3(1),lim3(2)])
 xlabel('\Delta t');
 ylabel('Error');
 set(gca,'FontSize',fs)
@@ -162,9 +185,13 @@ switch eqn
         legend({'(4,4,1):u','(4,4,1):u_x','(6,4,3):u','(6,4,3):u_x',...
         '(7,4,4):u','(7,4,4):u_x',sprintf('Slope %d',Sl4(1)),...
         sprintf('Slope %d',Sl4(2)),sprintf('Slope %d',Sl4(3))},'NumColumns',3)
+    case 'VarLinAdv'
+        legend({'(4,4,1):u','(4,4,1):u_x','(6,4,3):u','(6,4,3):u_x',...
+        '(7,4,4):u','(7,4,4):u_x',sprintf('Slope %d',Sl4(1)),...
+        sprintf('Slope %d',Sl4(2)),sprintf('Slope %d',Sl4(3))},'NumColumns',3)
 end
 xlim([dts(4,end),dts(4,1)])
-ylim([lim4(1),lim4(2)])
+%ylim([lim4(1),lim4(2)])
 xlabel('\Delta t');
 ylabel('Error');
 set(gca,'FontSize',fs)
@@ -200,9 +227,13 @@ switch eqn
         legend({'(7,5,1):u','(7,5,1):u_x','(8,5,4):u','(8,5,4):u_x',...
         '(9,5,5):u','(9,5,5):u_x',sprintf('Slope %d',Sl5(1)),...
         sprintf('Slope %d',Sl5(2)),sprintf('Slope %d',Sl5(3))},'NumColumns',3)
+    case 'VarLinAdv'
+        legend({'(7,5,1):u','(7,5,1):u_x','(8,5,4):u','(8,5,4):u_x',...
+        '(9,5,5):u','(9,5,5):u_x',sprintf('Slope %.1f',Sl5(1)),...
+        sprintf('Slope %d',Sl5(2)),sprintf('Slope %d',Sl5(3))},'NumColumns',3)
 end
 xlim([dts(7,end),dts(7,1)])
-ylim([lim5(1),lim5(2)])
+%ylim([lim5(1),lim5(2)])
 xlabel('\Delta t');
 ylabel('Error');
 set(gca,'FontSize',fs)
